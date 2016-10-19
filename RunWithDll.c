@@ -1225,6 +1225,7 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 
 	ULONG					nFixedLen = 0;
 	WCHAR*					pszFixedCommandLine = NULL;
+	ULONG					nDataLen = 0;
 	BOOL					bNeedFree = FALSE;
 	
 	BOOL	bFlag = FALSE;
@@ -1243,7 +1244,7 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 			nApplicationLen = (ULONG)wcslen( pszApplication );
 			nCommandlineLen = (ULONG)wcslen( pszCommandline );
 
-			nFixedLen = (nApplicationLen + 1 + nCommandlineLen + 1);
+			nFixedLen = nApplicationLen + 1 + nCommandlineLen + 1;
 
 			pszFixedCommandLine = (WCHAR*)malloc( nFixedLen * sizeof(WCHAR) );
 			if ( NULL == pszFixedCommandLine )
@@ -1254,9 +1255,16 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 
 			bNeedFree = TRUE;
 
-			wcsncpy( pszFixedCommandLine , pszApplication , nApplicationLen );
-			wcsncpy( pszFixedCommandLine + nApplicationLen , L" " , 1 );
-			wcsncpy( pszFixedCommandLine + nApplicationLen + 1 , pszCommandline , nCommandlineLen);
+			nDataLen = 0;
+
+			wcsncpy( pszFixedCommandLine + nDataLen, pszApplication , nApplicationLen );
+			nDataLen += nApplicationLen;
+
+			wcsncpy( pszFixedCommandLine + nDataLen , L" " , 1 );
+			nDataLen += 1;
+
+			wcsncpy( pszFixedCommandLine + nDataLen , pszCommandline , nCommandlineLen);
+			nDataLen += nCommandlineLen;
 		}
 		
 		bFlag = CreateProcessW(
