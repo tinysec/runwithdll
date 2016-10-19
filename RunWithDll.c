@@ -1219,7 +1219,13 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 	
 	STARTUPINFOW			stStartupInfo = {0};
 	PROCESS_INFORMATION		stProcessInfo = {0};
-	
+
+	ULONG					nApplicationLen = 0;
+	ULONG					nCommandlineLen = 0;
+
+	ULONG					nFixedLen = 0;
+	WCHAR*					pszFixedCommandLine = NULL;
+	BOOL					bNeedFree = FALSE;
 	
 	BOOL	bFlag = FALSE;
 	
@@ -1227,10 +1233,35 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 	do 
 	{
 		stStartupInfo.cb = sizeof(stStartupInfo);
+
+		if ( NULL == pszCommandline )
+		{
+			pszFixedCommandLine = NULL;
+		}
+		else
+		{
+			nApplicationLen = (ULONG)wcslen( pszApplication );
+			nCommandlineLen = (ULONG)wcslen( pszCommandline );
+
+			nFixedLen = (nApplicationLen + 1 + nCommandlineLen + 1);
+
+			pszFixedCommandLine = (WCHAR*)malloc( nFixedLen * sizeof(WCHAR) );
+			if ( NULL == pszFixedCommandLine )
+			{
+				break;
+			}
+			RtlZeroMemory( pszFixedCommandLine , nFixedLen * sizeof(WCHAR) );
+
+			bNeedFree = TRUE;
+
+			wcsncpy( pszFixedCommandLine , pszApplication , nApplicationLen );
+			wcsncpy( pszFixedCommandLine + nApplicationLen , L" " , 1 );
+			wcsncpy( pszFixedCommandLine + nApplicationLen + 1 , pszCommandline , nCommandlineLen);
+		}
 		
 		bFlag = CreateProcessW(
 			pszApplication,
-			pszCommandline,
+			pszFixedCommandLine,
 			NULL,
 			NULL,
 			TRUE,
@@ -1283,6 +1314,15 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 	{
 		CloseHandle(stProcessInfo.hThread);
 		stProcessInfo.hThread = NULL;
+	}
+
+	if ( bNeedFree )
+	{
+		if ( NULL != pszFixedCommandLine )
+		{
+			free( pszFixedCommandLine );
+			pszFixedCommandLine = NULL;
+		}
 	}
 	
 	return nFinalRet;
