@@ -1359,7 +1359,7 @@ LONG _RunWithDll_LdrInject(__in HANDLE hTargetProcess , __in HANDLE hTargetThrea
 }
 
 
-LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , __in WCHAR* pszTargetDll)
+LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , __in WCHAR* pszTargetDll , __in ULONG nWaitTime)
 {
 	LONG	nFinalRet = -1;
 	LONG	nRet = -1;
@@ -1437,6 +1437,8 @@ LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , _
 		{
 			break;
 		}
+
+		WaitForSingleObject( stProcessInfo.hProcess , nWaitTime );
 		
 		nFinalRet = 0;
 		

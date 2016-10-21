@@ -11,7 +11,7 @@ sample
 #include <stdlib.h>
 
 
-LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , __in WCHAR* pszTargetDll);
+LONG RunWithDllW(__in WCHAR* pszApplication , __in_opt WCHAR* pszCommandline , __in WCHAR* pszTargetDll , __in ULONG nWaitTime );
 
 
 int __cdecl wmain(int nArgc, WCHAR** ppArgv)
@@ -78,7 +78,7 @@ int __cdecl wmain(int nArgc, WCHAR** ppArgv)
 			pszCommandline = pszLeftCommandline;
 		}
 		
-		RunWithDllW( ppArgv[1] ,  pszCommandline , ppArgv[2]	);
+		RunWithDllW( ppArgv[1] ,  pszCommandline , ppArgv[2] , 0);
 		
 	} while (FALSE);
 
